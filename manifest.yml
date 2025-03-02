@@ -1,0 +1,46 @@
+lzc-sdk-version: "0.1"
+name: Wapy
+package: cloud.lazycat.app.wapy
+version: 1.2.3
+description: 一款跟踪和管理您的定期付款以及费用的软件
+homepage: https://www.wapy.dev
+author: wapy
+application:
+  subdomain: wapy
+  background_task: true
+  multi_instance: false
+  gpu_accel: false
+  kvm_accel: false
+  usb_accel: false
+  routes:
+    - /=http://wapydev-app.cloud.lazycat.app.wapy.lzcapp:3000/
+services:
+  wapydev-db:
+    image: registry.lazycat.cloud/czyt/library/postgres:0e3fd61dc630bf50
+    environment:
+      - POSTGRES_USER=wapydev
+      - POSTGRES_PASSWORD=wapydev
+      - POSTGRES_DB=wapydev
+    binds:
+      - /lzcapp/var/data:/var/lib/postgresql/data
+    health_check:
+      test:
+        - CMD-SHELL
+        - pg_isready
+  wapydev-app:
+    image: registry.lazycat.cloud/czyt/meceware/wapy.dev:aac2cc411396ab0c
+    environment: 
+     - DATABASE_URL=postgres://wapydev:wapydev@wapydev-db:5432/wapydev
+     - AUTH_SECRET=wapydev_lazycat
+     - AUTH_TRUST_HOST=true
+    depends_on:
+      - wapydev-db
+  wapydev-cron:
+    image: registry.lazycat.cloud/czyt/library/alpine:1c4eef651f65e2f7
+    command: >
+      sh -c 'while true; do
+        /usr/bin/flock -n /tmp/wapy.lockfile wget -qO- wapydev-app:3000/api/cron/;
+        sleep 60;
+      done'
+    depends_on:
+      - wapydev-app

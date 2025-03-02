@@ -1,0 +1,47 @@
+{
+  "name": "Wapy",
+  "package": "cloud.lazycat.app.wapy",
+  "description": "一款跟踪和管理您的定期付款以及费用的软件",
+  "homepage": "https://www.wapy.dev",
+  "author": "wapy",
+  "app_features": [
+    "background_task"
+  ],
+  "subdomain": "wapy",
+  "version": "1.2.3",
+  "iconPath": "icon.png",
+  "composePath": "docker-compose.yml",
+  "unsupported_platforms": [],
+  "lastRouteType": "from_compose",
+  "port_mappings": {
+    "wapydev-db_5432_5432": {
+      "use": false
+    },
+    "wapydev-app_3000_3000": {
+      "use": true,
+      "type": "http",
+      "path": "/",
+      "targetPath": "/"
+    }
+  },
+  "image_postgres_17.2": {
+    "originalImage": "postgres:17.2",
+    "pushTarget": "lazycat",
+    "newImageName": "registry.lazycat.cloud/czyt/library/postgres:0e3fd61dc630bf50",
+    "timestamp": "2025-03-02T00:49:34.402Z"
+  },
+  "wapydev-db_volume_/var/lib/postgresql/data_action": "emptyDir",
+  "wapydev-db_volume_/var/lib/postgresql/data_location": "app_data",
+  "image_ghcr.io_meceware_wapy.dev_latest": {
+    "originalImage": "ghcr.io/meceware/wapy.dev:latest",
+    "pushTarget": "lazycat",
+    "newImageName": "registry.lazycat.cloud/czyt/meceware/wapy.dev:aac2cc411396ab0c",
+    "timestamp": "2025-03-02T00:50:18.192Z"
+  },
+  "image_alpine_3.21": {
+    "originalImage": "alpine:3.21",
+    "pushTarget": "lazycat",
+    "newImageName": "registry.lazycat.cloud/czyt/library/alpine:1c4eef651f65e2f7",
+    "timestamp": "2025-03-02T00:50:36.589Z"
+  }
+}
