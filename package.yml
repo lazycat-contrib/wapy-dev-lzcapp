@@ -1,0 +1,14 @@
+package: cloud.lazycat.app.wapy
+version: 1.2.3
+name: Wapy
+description: "一款跟踪和管理您的定期付款以及费用的软件"
+min_os_version: "1.5.0"
+homepage: https://www.wapy.dev
+author: wapy
+locales:
+  zh:
+    description: "一款跟踪和管理您的定期付款以及费用的软件"
+    name: Wapy
+  en:
+    description: "Track and manage your recurring payments and expenses"
+    name: Wapy

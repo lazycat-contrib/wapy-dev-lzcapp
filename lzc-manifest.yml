@@ -1,0 +1,41 @@
+application:
+  subdomain: wapy
+  background_task: true
+  multi_instance: false
+  upstreams:
+    - location: /
+      backend: http://wapydev-app:3000/
+
+services:
+  wapydev-db:
+    # upstream: library/postgres:17.11
+    image: docker.1ms.run/library/postgres:17.11
+    environment:
+      - POSTGRES_USER=wapydev
+      - POSTGRES_PASSWORD={{ stable_secret "wapy#db_password" }}
+      - POSTGRES_DB=wapydev
+    binds:
+      - /lzcapp/var/data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready
+  wapydev-app:
+    # upstream: ghcr.io/meceware/wapy.dev:2.2.0
+    image: ghcr.1ms.run/meceware/wapy.dev:2.2.0
+    environment:
+      - DATABASE_URL=postgres://wapydev:{{ stable_secret "wapy#db_password" }}@wapydev-db:5432/wapydev
+      - AUTH_SECRET={{ stable_secret "wapy#auth_secret" }}
+      - AUTH_TRUST_HOST=true
+    depends_on:
+      - wapydev-db
+  wapydev-cron:
+    # upstream: library/alpine:3.24
+    image: docker.1ms.run/library/alpine:3.24
+    command: >
+      sh -c 'while true; do
+        /usr/bin/flock -n /tmp/wapy.lockfile wget -qO- wapydev-app:3000/api/cron/;
+        sleep 60;
+      done'
+    depends_on:
+      - wapydev-app

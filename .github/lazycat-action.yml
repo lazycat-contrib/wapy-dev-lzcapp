@@ -1,0 +1,60 @@
+version: 1
+
+project:
+  root: .
+  build_config: lzc-build.yml
+  package_file: package.yml
+  output: .lazycat-build/wapy.lpk
+  target_arch: amd64
+
+update:
+  strategy: publish
+  allow_downgrade: false
+  version_source:
+    type: image
+    image: wapydev-app
+
+build:
+  run_buildscript: false
+
+images:
+  - id: wapydev-app
+    target: service
+    service: wapydev-app
+    source: ghcr.io/meceware/wapy.dev
+    channel: stable
+    sort: semver
+    tag_regex: '^v?\d+\.\d+\.\d+$'
+    delivery:
+      mode: mirror
+  - id: wapydev-db
+    target: service
+    service: wapydev-db
+    source: library/postgres
+    channel: custom
+    sort: semver
+    tag_regex: '^17\.\d+$'
+    version_regex: '^(?P<version>17\.\d+)$'
+    version_template: '{version}.0'
+    delivery:
+      mode: mirror
+  - id: wapydev-cron
+    target: service
+    service: wapydev-cron
+    source: library/alpine
+    channel: custom
+    sort: semver
+    tag_regex: '^3\.\d+$'
+    version_regex: '^(?P<version>3\.\d+)$'
+    version_template: '{version}.0'
+    delivery:
+      mode: mirror
+
+stores:
+  official:
+    enabled: false
+  private:
+    enabled: true
+    skip_if_version_exists: true
+    name: Wapy
+    summary: "跟踪和管理您的定期付款以及费用的软件"
